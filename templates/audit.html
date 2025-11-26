@@ -35,12 +35,13 @@
                         <span class="badge badge-violation">Non-Compliant</span>
                         {% endif %}
                     </td>
-                    <td class="small text-muted">{{ log.details }}</td>
+                    <!-- FIX: Changed 'text-muted' to 'text-white' with opacity to ensure visibility on dark themes -->
+                    <td class="small text-white opacity-75">{{ log.details }}</td>
                 </tr>
                 {% else %}
                 <tr>
                     <td colspan="6" class="text-center p-4 text-muted">
-                        No logs found yet. Click "Scan Windows Logs" to fetch data from Event Viewer.
+                        No logs found yet. Click "Pull Latest Events" to fetch data from Event Viewer.
                     </td>
                 </tr>
                 {% endfor %}
