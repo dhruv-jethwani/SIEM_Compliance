@@ -3,52 +3,122 @@
 {% block content %}
 <div class="container pb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Executive Audit Report</h2>
+        <h2><i class="fas fa-file-medical-alt"></i> Executive Audit Report</h2>
         <button onclick="window.print()" class="btn btn-secondary">
             <i class="fas fa-print"></i> Print Report
         </button>
     </div>
 
-    <!-- Report Summary -->
-    <div class="card mb-4">
-        <div class="card-header bg-warning text-dark">
-            <i class="fas fa-exclamation-triangle"></i> Critical Attention Areas
+    <!-- Executive Summary Block -->
+    <div class="row mb-4">
+        <!-- Compliance Score -->
+        <div class="col-md-3">
+            <div class="card bg-dark text-white border-primary h-100 text-center">
+                <div class="card-header bg-primary fw-bold">System Compliance Score</div>
+                <div class="card-body d-flex flex-column justify-content-center">
+                    <h1 class="display-1 fw-bold {{ 'text-success' if score > 80 else 'text-danger' }}">
+                        {{ score }}%
+                    </h1>
+                    <p class="text-muted small">Based on system-wide audit analysis.</p>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-            <p>The following report aggregates compliance data from the UNACP agents.</p>
-            <div class="alert alert-danger">
-                <strong>Critical Findings:</strong> {{ high_fails }} incidents involved policies marked as "High Severity". Immediate remediation is required for devices failing Antivirus and Password policies.
+
+        <!-- Top Violations -->
+        <div class="col-md-3">
+            <div class="card bg-dark text-white border-secondary h-100">
+                <div class="card-header fw-bold">Top Policy Violations</div>
+                <ul class="list-group list-group-flush">
+                    {% if top_violations %}
+                        {% for name, count in top_violations %}
+                        <li class="list-group-item bg-dark text-white d-flex justify-content-between align-items-center">
+                            <span class="small">{{ name }}</span>
+                            <span class="badge bg-danger rounded-pill">{{ count }}</span>
+                        </li>
+                        {% endfor %}
+                    {% else %}
+                        <li class="list-group-item bg-dark text-success text-center">No Violations Found</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Recent Critical Incidents -->
+        <div class="col-md-3">
+            <div class="card bg-dark text-white border-danger h-100">
+                <div class="card-header bg-danger fw-bold">Critical Incidents</div>
+                <div class="list-group list-group-flush">
+                    {% if critical_logs %}
+                        {% for log in critical_logs %}
+                        <div class="list-group-item bg-dark text-white">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1 text-danger small fw-bold">{{ log.policy }}</h6>
+                                <small style="font-size: 0.65rem;">{{ log.time.strftime('%m-%d %H:%M') }}</small>
+                            </div>
+                            <small class="text-white opacity-75" style="font-size: 0.7rem;">{{ log.details }}</small>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="p-3 text-center text-success">
+                            <i class="fas fa-check-circle mb-2"></i><br>
+                            No Critical Severity Events
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Remediation Strategy (NEW) -->
+        <div class="col-md-3">
+            <div class="card bg-dark text-white border-info h-100">
+                <div class="card-header bg-info text-dark fw-bold">Remediation Strategy</div>
+                <div class="card-body p-2">
+                    {% if recommendations %}
+                        <ul class="list-unstyled mb-0">
+                        {% for rec in recommendations %}
+                            <li class="mb-2 small">
+                                <i class="fas fa-angle-right text-info"></i> {{ rec }}
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-success small text-center mb-0 mt-3">Systems nominal. Continue standard monitoring.</p>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Detailed List -->
-    <h4>Full Compliance Ledger</h4>
-    <hr class="bg-light">
+    <!-- Detailed Ledger (Filtered) -->
+    <h4 class="mt-5 text-danger"><i class="fas fa-exclamation-triangle"></i> Violation Appendix (Non-Compliant Events Only)</h4>
+    <p class="text-muted small">The following table lists the last 100 failed policy checks. Compliant events have been omitted for brevity.</p>
+    <hr class="bg-secondary">
     
     <div class="table-responsive">
-        <table class="table table-bordered table-dark">
+        <table class="table table-bordered table-dark table-hover table-sm">
             <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Asset</th>
-                    <th>Policy</th>
+                <tr class="table-active">
+                    <th>Timestamp</th>
+                    <th>Asset IP</th>
+                    <th>User</th>
+                    <th>Policy Control</th>
                     <th>Status</th>
                 </tr>
             </thead>
             <tbody>
                 {% for log in logs %}
                 <tr>
-                    <td>{{ log.timestamp.strftime('%Y-%m-%d') }}</td>
-                    <td>{{ log.device_ip }} ({{ log.user }})</td>
+                    <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td class="font-monospace text-info">{{ log.device_ip }}</td>
+                    <td>{{ log.user }}</td>
                     <td>{{ log.policy_name }}</td>
                     <td>
-                        {% if log.compliance_status == 'Compliant' %}
-                            <span class="text-success">PASS</span>
-                        {% else %}
-                            <span class="text-danger fw-bold">FAIL</span>
-                        {% endif %}
+                        <span class="badge bg-danger">FAIL</span>
                     </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center text-success p-3">No violations found in the recent audit window.</td>
                 </tr>
                 {% endfor %}
             </tbody>
