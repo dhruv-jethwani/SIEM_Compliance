@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container pb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Executive Audit Report</h2>
+        <button onclick="window.print()" class="btn btn-secondary">
+            <i class="fas fa-print"></i> Print Report
+        </button>
+    </div>
+
+    <!-- Report Summary -->
+    <div class="card mb-4">
+        <div class="card-header bg-warning text-dark">
+            <i class="fas fa-exclamation-triangle"></i> Critical Attention Areas
+        </div>
+        <div class="card-body">
+            <p>The following report aggregates compliance data from the UNACP agents.</p>
+            <div class="alert alert-danger">
+                <strong>Critical Findings:</strong> {{ high_fails }} incidents involved policies marked as "High Severity". Immediate remediation is required for devices failing Antivirus and Password policies.
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed List -->
+    <h4>Full Compliance Ledger</h4>
+    <hr class="bg-light">
+    
+    <div class="table-responsive">
+        <table class="table table-bordered table-dark">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Asset</th>
+                    <th>Policy</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td>{{ log.timestamp.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ log.device_ip }} ({{ log.user }})</td>
+                    <td>{{ log.policy_name }}</td>
+                    <td>
+                        {% if log.compliance_status == 'Compliant' %}
+                            <span class="text-success">PASS</span>
+                        {% else %}
+                            <span class="text-danger fw-bold">FAIL</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

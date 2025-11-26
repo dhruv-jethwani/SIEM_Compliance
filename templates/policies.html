@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Policy Management</h2>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPolicyModal">
+        <i class="fas fa-plus"></i> Add New Policy
+    </button>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <table class="table table-hover table-dark">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Policy Name</th>
+                    <th>Description</th>
+                    <th>Severity</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for policy in policies %}
+                <tr>
+                    <td>{{ policy.id }}</td>
+                    <td><strong>{{ policy.name }}</strong></td>
+                    <td>{{ policy.description }}</td>
+                    <td>
+                        <span class="badge badge-{{ policy.severity.lower() }}">
+                            {{ policy.severity }}
+                        </span>
+                    </td>
+                    <td>{{ policy.status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add Policy Modal -->
+<div class="modal fade" id="addPolicyModal" tabindex="-1" style="color: #000;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Define New Policy</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('policies') }}" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Policy Name</label>
+                        <input type="text" class="form-control" name="name" required placeholder="e.g. SSH Root Login">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" name="description" rows="2" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Severity</label>
+                        <select class="form-select" name="severity">
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Policy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

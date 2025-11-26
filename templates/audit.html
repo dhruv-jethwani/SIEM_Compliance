@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Audit Logs (Live Windows Data)</h2>
+    <a href="{{ url_for('scan_logs') }}" class="btn btn-warning">
+        <i class="fas fa-sync"></i> Pull Latest Events
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-dark table-striped mb-0">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Device IP</th>
+                    <th>User</th>
+                    <th>Policy Map</th>
+                    <th>Result</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td class="text-info font-monospace">{{ log.device_ip }}</td>
+                    <td>{{ log.user }}</td>
+                    <td>{{ log.policy_name }}</td>
+                    <td>
+                        {% if log.compliance_status == 'Compliant' %}
+                        <span class="badge badge-compliance">Compliant</span>
+                        {% else %}
+                        <span class="badge badge-violation">Non-Compliant</span>
+                        {% endif %}
+                    </td>
+                    <td class="small text-muted">{{ log.details }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center p-4 text-muted">
+                        No logs found yet. Click "Scan Windows Logs" to fetch data from Event Viewer.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
