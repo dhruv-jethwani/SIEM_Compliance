@@ -68,7 +68,7 @@ This application is designed to run on a **Windows operating system** and requir
    The first run will initialize the `unacp.db` file and populate the 20+ default policies.
 
    ```bash
-   python app.py
+   python "/path/to/app.py"
    ```
 
 5. **Access the Application:**
