@@ -75,7 +75,7 @@ This application is designed to run on a **Windows operating system** and requir
    Open your web browser and navigate to:
 
    ```
-   [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
+   http://127.0.0.1:5000/
    ```
 
 ## 📋 Usage Instructions
